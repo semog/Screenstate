@@ -1,0 +1,22 @@
+PODS:
+  - desktop_screenstate (0.0.1):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+
+DEPENDENCIES:
+  - desktop_screenstate (from `Flutter/ephemeral/.symlinks/plugins/desktop_screenstate/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+
+EXTERNAL SOURCES:
+  desktop_screenstate:
+    :path: Flutter/ephemeral/.symlinks/plugins/desktop_screenstate/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+
+SPEC CHECKSUMS:
+  desktop_screenstate: 9a89553b1e736abcc9649821bb96b05a7b7be178
+  FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
+
+PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
+
+COCOAPODS: 1.11.3
