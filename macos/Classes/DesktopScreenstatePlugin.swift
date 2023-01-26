@@ -16,8 +16,7 @@ public class DesktopScreenstatePlugin: NSObject, FlutterPlugin {
     super.init()
      NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(screenDidSleep), name: NSWorkspace.screensDidSleepNotification, object: nil)
  NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(screenDidWake), name: NSWorkspace.screensDidWakeNotification, object: nil)
-    // NotificationCenter.default.addObserver(self, selector: #selector(onApplicationActiveStateNotification), name: NSApplication.willBecomeActiveNotification, object: nil)
-    // NotificationCenter.default.addObserver(self, selector: #selector(onApplicationActiveStateNotification), name: NSApplication.willResignActiveNotification, object: nil)
+    
   }
 @objc func screenDidSleep() {
  dispatchApplicationState(active: true)
@@ -26,19 +25,7 @@ public class DesktopScreenstatePlugin: NSObject, FlutterPlugin {
 @objc func screenDidWake() {
    dispatchApplicationState(active: false)
 }
-  // @objc func onApplicationActiveStateNotification(notification: Notification) {
-  //   switch notification.name {
-  //   case NSApplication.willBecomeActiveNotification:
-  //     dispatchApplicationState(active: true)
-  //     break
-  //   case NSApplication.willResignActiveNotification:
-  //     dispatchApplicationState(active: false)
-  //     break
-  //   default:
-  //     debugPrint("invalid notification received: \(notification.name)")
-  //   }
-  // }
-
+ 
   private func dispatchApplicationState(active: Bool) {
     channel.invokeMethod("onScreenStateChange", arguments: active)
   }
