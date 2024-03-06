@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: ValueListenableBuilder<bool>(
+        body: ValueListenableBuilder<ScreenState>(
           valueListenable: _screenstatePlugin.isActive,
           builder: (context, value, child) => Center(
             child: Text('Screen state on: $value'),
