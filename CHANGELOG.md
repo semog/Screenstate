@@ -1,3 +1,12 @@
+## 0.0.4
+
+* windows support added
+
+## 0.0.3
+
+* added more events for better understanding
+* support for latest flutter version
+
 ## 0.0.2+1
 
 * minor bug fixes
