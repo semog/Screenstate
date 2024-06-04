@@ -129,7 +129,8 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
 ### Linux
 This plugin relies on the gnome-screensaver to provide screen state information.
 
-Important Note: If gnome-screensaver is not installed on your Linux system, please install it before using this plugin. The functionality of the plugin depends on the presence of gnome-screensaver.
+#### Linux Important Note:
+If gnome-screensaver is not installed on your Linux system, please install it before using this plugin. The functionality of the plugin depends on the presence of gnome-screensaver.
 ```
 sudo apt-get install gnome-screensaver
 ```
