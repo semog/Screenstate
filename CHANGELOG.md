@@ -1,3 +1,6 @@
+## 0.0.5
+
+* linux support added
 ## 0.0.4
 
 * windows support added
