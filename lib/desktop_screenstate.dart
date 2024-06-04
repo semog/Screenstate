@@ -36,7 +36,7 @@ class DesktopScreenState {
           .listen((String line) {
         // Filter lines containing "boolean true" or "boolean false"
         if (line.contains(RegExp(r"boolean true|boolean false"))) {
-          if (line == "boolean true") {
+          if (line.trim() == "boolean true") {
             _activeState.value = ScreenState.locked;
           } else {
             _activeState.value = ScreenState.unlocked;
