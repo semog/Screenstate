@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -13,14 +15,50 @@ class DesktopScreenState {
   static DesktopScreenState get instance {
     if (_instance == null) {
       _instance = DesktopScreenState._();
-      _channel.setMethodCallHandler(_instance!._handleMethodCall);
+      if (Platform.isWindows || Platform.isMacOS) {
+        _channel.setMethodCallHandler(_instance!._handleMethodCall);
+      } else if (Platform.isLinux) {
+        linuxCode();
+      }
     }
     return _instance!;
   }
 
+  static void linuxCode() {
+    Process.start('dbus-monitor', [
+      '--session',
+      "type='signal',interface='org.gnome.ScreenSaver'"
+    ]).then((Process process) {
+      // Capture stdout and stderr streams
+      process.stdout
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen((String line) {
+        // Filter lines containing "boolean true" or "boolean false"
+        if (line.contains(RegExp(r"boolean true|boolean false"))) {
+          if (line == "boolean true") {
+            _activeState.value = ScreenState.locked;
+          } else {
+            _activeState.value = ScreenState.unlocked;
+          }
+          // Handle the output as needed
+        }
+      });
+
+      // Listen for process exit
+      process.exitCode.then((int code) {
+        debugPrint('Process exited with code $code');
+        // Handle process exit, if needed
+      });
+    }).catchError((error) {
+      debugPrint('Error starting process: $error');
+      // Handle any errors that occur during process startup
+    });
+  }
+
   DesktopScreenState._();
 
-  final ValueNotifier<ScreenState> _activeState =
+  static final ValueNotifier<ScreenState> _activeState =
       ValueNotifier(ScreenState.awaked);
 
   ValueListenable<ScreenState> get isActive {

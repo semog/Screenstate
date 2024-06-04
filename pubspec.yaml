@@ -6,7 +6,10 @@ homepage: https://github.com/alihassan143/Screenstate
 environment:
   sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.6.0"
-
+platforms:
+  macos:
+  linux:
+  windows:
 dependencies:
   flutter:
     sdk: flutter
