@@ -84,7 +84,6 @@ class DesktopScreenState {
           .transform(utf8.decoder)
           .transform(const LineSplitter())
           .listen((String line) {
-        debugPrint(line);
         // Check if the line contains the IdleHint property change
         final match = _idleHintRegex.firstMatch(line);
 
