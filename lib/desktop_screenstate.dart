@@ -7,24 +7,39 @@ import 'package:flutter/services.dart';
 
 enum ScreenState { sleep, awaked, locked, unlocked }
 
+/// Which screen state monitor to use on Linux
+enum ScreenStateMonitor { dbus, gdbus }
+
 class DesktopScreenState {
-  static const MethodChannel _channel = MethodChannel('screenstate');
+  static const _channel = MethodChannel('screenstate');
 
+  /// Set the screen state monitor to use on Linux
+  static var linuxMonitor = ScreenStateMonitor.dbus;
+
+  /// Singleton instance of DesktopScreenState
   static DesktopScreenState? _instance;
+  static DesktopScreenState get instance => _instance ?? _createInstance();
 
-  static DesktopScreenState get instance {
-    if (_instance == null) {
-      _instance = DesktopScreenState._();
-      if (Platform.isWindows || Platform.isMacOS) {
-        _channel.setMethodCallHandler(_instance!._handleMethodCall);
-      } else if (Platform.isLinux) {
-        linuxCode();
+  static DesktopScreenState _createInstance() {
+    final instance = DesktopScreenState._();
+
+    if (Platform.isWindows || Platform.isMacOS) {
+      _channel.setMethodCallHandler(instance._handleMethodCall);
+    } else if (Platform.isLinux) {
+      switch (linuxMonitor) {
+        case ScreenStateMonitor.gdbus:
+          runGdbusLinuxMonitor();
+          break;
+        case ScreenStateMonitor.dbus:
+          runDbusLinuxMonitor();
+          break;
       }
     }
-    return _instance!;
+
+    return instance;
   }
 
-  static void linuxCode() {
+  static void runDbusLinuxMonitor() {
     Process.start('dbus-monitor', [
       '--session',
       "type='signal',interface='org.gnome.ScreenSaver'"
@@ -56,14 +71,50 @@ class DesktopScreenState {
     });
   }
 
+  // Regex to find the Session IdleHint property and capture its boolean value
+  static final _idleHintRegex =
+      RegExp(r"Session.*'IdleHint'\s*:\s*<(?<value>true|false)>");
+
+  static void runGdbusLinuxMonitor() {
+    Process.start(
+            'gdbus', ['monitor', '--system', '--dest=org.freedesktop.login1'])
+        .then((Process process) {
+      // Capture stdout and stderr streams
+      process.stdout
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen((String line) {
+        debugPrint(line);
+        // Check if the line contains the IdleHint property change
+        final match = _idleHintRegex.firstMatch(line);
+
+        if (match == null) {
+          return;
+        }
+
+        // Extract the captured boolean value ('true' or 'false')
+        final valueString = match.namedGroup('value')?.toLowerCase() ?? 'false';
+
+        _activeState.value =
+            valueString == 'true' ? ScreenState.locked : ScreenState.unlocked;
+      });
+
+      // Listen for process exit
+      process.exitCode.then((int code) {
+        debugPrint('Process exited with code $code');
+        // Handle process exit, if needed
+      });
+    }).catchError((error) {
+      debugPrint('Error starting process: $error');
+      // Handle any errors that occur during process startup
+    });
+  }
+
   DesktopScreenState._();
 
-  static final ValueNotifier<ScreenState> _activeState =
-      ValueNotifier(ScreenState.awaked);
+  static final _activeState = ValueNotifier(ScreenState.awaked);
 
-  ValueListenable<ScreenState> get isActive {
-    return _activeState;
-  }
+  ValueListenable<ScreenState> get isActive => _activeState;
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
