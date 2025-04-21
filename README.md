@@ -143,7 +143,39 @@ sudo apt-get install gnome-screensaver
   desktop_screenstate: $latest_version
 ```
 
-2. Then you can use `DesktopScreenState.instance.isActive` to listen window active event.
+2. **Linux ONLY** - Only needed if your app will run on Linux.
+
+In your main() function, select the monitor service type to use. By default, the `dbus-monitor` service is used. However, you may find that the `gdbus` service is more reliable.
+
+The `dbus-monitor` service is included in the standard D-Bus package (`dbus-utils` or equivalent). The `gdbus` requires GLib 2.26+ (typically installed via the `glib2` package).
+```
+sudo apt-get install glib2
+```
+
+In your `main.dart` file, add the following to your `main()` function. The process exit cleanup code is needed regardless of which type of monitor service you select. If this cleanup code is not added, then background processes will be left running, and they will accumulate over time as your application is started and stopped.
+```dart
+import 'package:desktop_screenstate/desktop_screenstate.dart';
+
+void main() {
+  DesktopScreenState.linuxMonitor = ScreenStateMonitor.gdbus;
+  /// Hook into the process exit signals to clean up processes
+  ProcessSignal.sigint.watch().listen((_) => shutdownApp());
+  ProcessSignal.sigterm.watch().listen((_) => shutdownApp());
+
+  runApp(MyApp());
+}
+
+void shutdownApp() {
+  try {
+    DesktopScreenState.dispose();
+    // ... Add your custom cleanup logic here ...
+  } finally {
+    exit(0);
+  }
+}
+```
+
+3. Then you can use `DesktopScreenState.instance.isActive` to listen window active event.
 
 ```dart
 final ValueListenable<bool> event = DesktopScreenState.instance.isActive;
@@ -155,7 +187,7 @@ event.addListener(() {
 });
 
 ```
-2. You can now utilize `DesktopScreenState.instance.state` to get the current state of the screen:
+4. You can now utilize `DesktopScreenState.instance.state` to get the current state of the screen:
 
 ```dart
 final ScreenState state = DesktopScreenState.instance.state;
