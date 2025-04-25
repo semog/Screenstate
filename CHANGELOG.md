@@ -1,3 +1,7 @@
+## 0.0.6
+
+* feat: Add support for alternative gdbus monitor on Linux. by @semog in https://github.com/alihassan143/Screenstate/pull/1
+* feat: Add support for package manage in linux
 ## 0.0.5
 
 * linux support added
