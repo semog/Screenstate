@@ -1,6 +1,6 @@
 name: desktop_screenstate
 description: Flutter package to detect desktop screen is on or off.
-version: 0.0.5+1
+version: 0.0.6+1
 homepage: https://github.com/alihassan143/Screenstate
 
 environment:
@@ -13,7 +13,7 @@ platforms:
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.0.2
+  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:desktop_screenstate/desktop_screenstate.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +19,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     DesktopScreenState.instance.isActive.addListener(() {
-      log(DesktopScreenState.instance.isActive.value.toString());
+      print(DesktopScreenState.instance.isActive.value.toString());
     });
     super.initState();
   }
